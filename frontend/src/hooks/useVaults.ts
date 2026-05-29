@@ -20,7 +20,7 @@ export interface VaultView {
   statePubkey: string;
   treasuryPubkey: string;
   managerPubkey: string;
-  status: "paper" | "active" | "cooldown" | "frozen" | "closed";
+  status: "launchpad" | "active" | "cooldown" | "frozen" | "closed";
   tvl: number;
   juniorCapital: number;
   seniorCapital: number;
@@ -75,11 +75,11 @@ function tokenUnitsToUsdc(units: bigint): number {
 }
 
 function deriveStatus(state: VaultStateData): VaultView["status"] {
-  if (state.isPaperMode) return "paper";
+  if (state.isPaperMode) return "launchpad";
   if (state.juniorCapital === 0n && state.isGraduated) return "frozen";
   if (state.isPaused) return "cooldown";
   if (state.isGraduated) return "active";
-  return "paper";
+  return "launchpad";
 }
 
 function deriveHealth(state: VaultStateData): number {
@@ -260,7 +260,7 @@ export function normalizeVaultView(v: ApiVaultView): VaultView {
     statePubkey: v.statePubkey || "",
     treasuryPubkey: v.treasuryPubkey || "",
     managerPubkey: v.managerPubkey || "",
-    status: v.status || "paper",
+    status: v.status || "launchpad",
     tvl: Number(v.tvl ?? juniorCapital + seniorCapital),
     juniorCapital,
     seniorCapital,

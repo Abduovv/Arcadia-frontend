@@ -16,13 +16,13 @@ import { usePositions } from "@/hooks/usePositions";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-const statusOptions: VaultStatus[] = ["active", "paper", "cooldown", "frozen"];
+const statusOptions: VaultStatus[] = ["active", "launchpad", "cooldown", "frozen"];
 
 const Vaults = () => {
   const { data: vaults, isLoading, error } = useVaults();
   const { data: positions } = usePositions();
   const [query, setQuery] = useState("");
-  const [statuses, setStatuses] = useState<VaultStatus[]>(["active", "paper"]);
+  const [statuses, setStatuses] = useState<VaultStatus[]>(["active", "launchpad"]);
   const [minHealth, setMinHealth] = useState([0]);
   const [instantOnly, setInstantOnly] = useState(false);
   const [sort, setSort] = useState<"tvl" | "health" | "recent">("tvl");
@@ -32,7 +32,7 @@ const Vaults = () => {
   const protocolStats = useMemo(() => ({
     totalVaults: allVaults.length,
     totalTVL: allVaults.reduce((s, v) => s + v.tvl, 0),
-    graduatedVaults: allVaults.filter(v => v.status !== "paper").length,
+    graduatedVaults: allVaults.filter(v => v.status !== "launchpad").length,
     protectedCapital: allVaults.reduce((s, v) => s + v.seniorCapital, 0),
   }), [allVaults]);
 
@@ -153,7 +153,7 @@ const Vaults = () => {
                     <Link
                       to={`/vault/${pos.vault.id}`}
                       className="flex-shrink-0 w-[190px] surface rounded-[11px] p-4 block relative overflow-hidden
-                        hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-200 group"
+                        hover:border-primary/30 hover:-translate-y-0.5 transition-[transform,border-color] duration-200 group"
                     >
                       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                       <p className="font-display font-semibold text-[13px] truncate leading-tight">
@@ -273,7 +273,7 @@ const Vaults = () => {
           </div>
 
           {/* Right sidebar */}
-          <aside className="hidden w-68 shrink-0 space-y-4 xl:block">
+          <aside className="hidden w-64 shrink-0 space-y-4 xl:block">
             <div className="surface rounded-lg p-4">
               <div className="mb-3 flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 <WalletCards className="h-3.5 w-3.5 text-primary" />
@@ -303,7 +303,7 @@ const Vaults = () => {
               <div className="space-y-3 text-[12px] text-muted-foreground leading-relaxed">
                 <p>Trader junior capital takes first loss before senior deposits.</p>
                 <p>Instant exits unlock when the junior buffer drops below 20%.</p>
-                <p>Paper vaults cannot accept investor deposits until graduation.</p>
+                <p>Trader Launchpad vaults cannot accept investor deposits until graduation.</p>
               </div>
             </div>
 

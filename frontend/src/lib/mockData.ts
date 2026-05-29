@@ -1,5 +1,5 @@
 // Mock data for Arcadia MVP — vaults, traders, performance, alerts
-export type VaultStatus = "paper" | "active" | "cooldown" | "frozen" | "closed";
+export type VaultStatus = "launchpad" | "active" | "cooldown" | "frozen" | "closed";
 export type TraderTier = "novice" | "proven" | "established" | "veteran" | "elite";
 
 export interface Trader {
@@ -91,7 +91,7 @@ export interface Alert {
   id: string;
   time: string;
   vaultId?: string;
-  kind: "junior_low" | "cooldown" | "freeze" | "graduate" | "fee" | "instant_exit" | "paper_complete";
+  kind: "junior_low" | "cooldown" | "freeze" | "graduate" | "fee" | "instant_exit" | "launchpad_complete";
   title: string;
   description: string;
   read: boolean;
@@ -234,7 +234,7 @@ export const traders: Trader[] = [
     avgJuniorRatio: 35,
     longestPaperRecord: 18,
     avgRecoveryDays: 0,
-    bio: "Currently building paper-mode track record on first vault.",
+      bio: "Currently building launchpad track record on first vault.",
   },
 ];
 
@@ -273,7 +273,7 @@ export const vaults: Vault[] = [
     activity: [
       { id: "a1", time: "2025-04-21T14:22:00Z", kind: "investor_deposit", message: "Investor deposited 25,000 USDC" },
       { id: "a2", time: "2025-04-15T11:00:00Z", kind: "fee", message: "Performance fee claimed: 8,400 USDC" },
-      { id: "a3", time: "2024-05-02T00:00:00Z", kind: "graduate", message: "Vault graduated from paper mode" },
+      { id: "a3", time: "2024-05-02T00:00:00Z", kind: "graduate", message: "Vault graduated from Trader Launchpad" },
     ],
   },
   {
@@ -433,7 +433,7 @@ export const vaults: Vault[] = [
     id: "vlt-007",
     name: "First Steps",
     traderWallet: traders[4].wallet,
-    status: "paper",
+      status: "launchpad",
     tvl: 45_000,
     juniorCapital: 45_000,
     seniorCapital: 0,
@@ -510,7 +510,7 @@ export const alerts: Alert[] = [
 export const protocolStats = {
   totalVaults: 8,
   totalTVL: vaults.reduce((s, v) => s + v.tvl, 0),
-  graduatedVaults: vaults.filter(v => v.status !== "paper").length,
+  graduatedVaults: vaults.filter(v => v.status !== "launchpad").length,
   protectedCapital: vaults.reduce((s, v) => s + v.seniorCapital, 0),
 };
 

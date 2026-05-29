@@ -47,7 +47,7 @@ describe("backend-backed read hooks", () => {
     vi.stubEnv("VITE_KILN_API_URL", "http://kiln-api.test");
     vi.stubEnv("VITE_ARCADIA_DEMO_MODE", "false");
     vi.stubEnv("VITE_ARCADIA_EXECUTION_ENV", "");
-    localStorage.setItem("kiln:data-mode", "real");
+    localStorage.setItem("arcadia:data-mode", "real");
     mocks.publicKey = key(1);
     mocks.connection = null;
   });
@@ -60,7 +60,7 @@ describe("backend-backed read hooks", () => {
 
   it("loads deterministic mock vaults without API, wallet, or RPC when mock mode is selected", async () => {
     vi.unstubAllEnvs();
-    localStorage.setItem("kiln:data-mode", "mock");
+    localStorage.setItem("arcadia:data-mode", "mock");
     mocks.publicKey = undefined;
     mocks.connection = null;
 

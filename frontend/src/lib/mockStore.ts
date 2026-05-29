@@ -21,7 +21,7 @@ class MockStore {
 
   private emit() {
     if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("kiln:mock-update"));
+      window.dispatchEvent(new CustomEvent("arcadia:mock-update"));
     }
   }
 
@@ -115,7 +115,7 @@ class MockStore {
 
   graduateVault(vaultId: string): void {
     const vault = this.vaults.find(v => v.id === vaultId);
-    if (!vault || vault.status !== "paper") return;
+    if (!vault || vault.status !== "launchpad") return;
     vault.status = "active" as VaultStatus;
     vault.graduatedAt = new Date().toISOString().slice(0, 10);
     vault.paperDaysElapsed = vault.paperDaysRequired;
@@ -123,14 +123,14 @@ class MockStore {
       id: `a${Date.now()}`,
       time: nowIso(),
       kind: "graduate",
-      message: "Vault graduated from paper mode — investor deposits now open",
+      message: "Vault graduated from Trader Launchpad — investor deposits now open",
     });
     this.addAlert({
       time: nowIso(),
       vaultId,
       kind: "graduate",
       title: `${vault.name} graduated`,
-      description: "Vault passed paper mode. Investor deposits are now open.",
+      description: "Vault passed Trader Launchpad. Investor deposits are now open.",
       read: false,
     });
     this.emit();
@@ -162,7 +162,7 @@ class MockStore {
       id,
       name: params.name || "New Vault",
       traderWallet: "7xKa...P9mZ",
-      status: "paper" as VaultStatus,
+      status: "launchpad" as VaultStatus,
       tvl: params.juniorAmount,
       juniorCapital: params.juniorAmount,
       seniorCapital: 0,

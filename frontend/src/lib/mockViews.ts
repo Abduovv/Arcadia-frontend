@@ -55,7 +55,7 @@ export function mockVaultViews(): VaultView[] {
       rolling24hLossBps: Math.max(0, Math.round(Math.abs(Math.min(vault.return7d, 0)) * 100)),
       rolling7dLossBps: Math.max(0, Math.round(Math.abs(Math.min(vault.maxDrawdown, 0)) * 100)),
       tradingEnabled: vault.status !== "frozen" && vault.status !== "cooldown",
-      instantExit: vault.instantExit,
+      instantExit: vault.instantExit || vault.status === "active" && vault.juniorHealth < 20,
       vaultIndex: index,
       sparkline,
       return30d: vault.return30d + liveJitter(index + 8, 0.15),

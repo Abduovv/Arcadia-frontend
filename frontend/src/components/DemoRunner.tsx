@@ -118,7 +118,7 @@ export function DemoRunner() {
         break;
 
       case "create-vault-submit": {
-        toast.info("Initialising manager profile…");
+        toast.info("Initialising trader profile…");
         await sleep(700);
         toast.info("Creating vault on-chain…");
         await sleep(900);
@@ -257,8 +257,8 @@ export function DemoRunner() {
 
   useEffect(() => {
     const handler = () => startDemo();
-    window.addEventListener("kiln:demo-start", handler);
-    return () => window.removeEventListener("kiln:demo-start", handler);
+    window.addEventListener("arcadia:demo-start", handler);
+    return () => window.removeEventListener("arcadia:demo-start", handler);
   }, [startDemo]);
 
   // ── Pause / resume toggle ──────────────────────────────────────────────────
@@ -530,7 +530,7 @@ function ControlBtn({
 
 /* ── Nav trigger button ──────────────────────────────────────────────────── */
 export function DemoTriggerButton({ className }: { className?: string }) {
-  const fire = () => window.dispatchEvent(new CustomEvent("kiln:demo-start"));
+  const fire = () => window.dispatchEvent(new CustomEvent("arcadia:demo-start"));
   return (
     <button
       onClick={fire}

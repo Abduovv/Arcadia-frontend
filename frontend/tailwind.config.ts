@@ -71,7 +71,7 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         status: {
-          paper: "hsl(var(--status-paper))",
+          launchpad: "hsl(var(--status-launchpad))",
           active: "hsl(var(--status-active))",
           cooldown: "hsl(var(--status-cooldown))",
           frozen: "hsl(var(--status-frozen))",

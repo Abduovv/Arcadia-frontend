@@ -63,7 +63,7 @@ const VaultDetail = () => {
   const handleDeposit = async () => {
     if (!connected) { toast.error("Connect a wallet first"); return; }
     if (role !== "investor") { toast.error("Switch to investor mode to deposit"); return; }
-    if (vault.status === "paper") { toast.error("Deposits open after graduation"); return; }
+    if (vault.status === "launchpad") { toast.error("Deposits open after graduation"); return; }
     if (vault.status === "frozen") { toast.error("Deposits are closed"); return; }
     if (!hasValidAmount) { toast.error("Enter a valid USDC amount"); return; }
     setSending(true);
@@ -193,8 +193,8 @@ const VaultDetail = () => {
               Trading paused. Junior buffer recovering.
             </Banner>
           )}
-          {vault.status === "paper" && (
-            <Banner variant="info" title="Paper mode">
+          {vault.status === "launchpad" && (
+            <Banner variant="info" title="Trader Launchpad">
               {vault.paperTradeCount}/{vault.minQualifyingTrades} qualifying trades. Investor deposits open after graduation.
             </Banner>
           )}
@@ -232,7 +232,7 @@ const VaultDetail = () => {
               </div>
               <dl className="grid sm:grid-cols-2 gap-x-8 gap-y-0">
                 {[
-                  { l: "Paper mode", v: vault.status === "paper" ? "In progress" : "Completed" },
+                  { l: "Trader Launchpad", v: vault.status === "launchpad" ? "In progress" : "Completed" },
                   { l: "Trading", v: vault.tradingEnabled ? "Enabled" : "Disabled" },
                   { l: "Junior ratio", v: `${juniorPct}%` },
                   { l: "Manager fee", v: `${vault.feeBps / 100}% above HWM` },
@@ -322,7 +322,7 @@ const VaultDetail = () => {
               </div>
 
               <div className="p-5">
-                {vault.status === "paper" ? (
+                {vault.status === "launchpad" ? (
                   <Banner variant="info" title="Deposits open after graduation">
                     This vault is still building its on-chain track record.
                   </Banner>

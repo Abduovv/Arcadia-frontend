@@ -2,7 +2,7 @@ import { getKilnApiUrl, isArcadiaDemoMode, isArcadiaDevnetProductMode } from "./
 
 export type DataMode = "mock" | "real";
 
-export const DATA_MODE_STORAGE_KEY = "kiln:data-mode";
+export const DATA_MODE_STORAGE_KEY = "arcadia:data-mode";
 
 function hasRealApiConfigured(): boolean {
   if (isArcadiaDevnetProductMode()) return true;
@@ -36,7 +36,7 @@ export function getStoredDataMode(storage: Storage | undefined = globalThis.loca
 
 export function setStoredDataMode(mode: DataMode, storage: Storage | undefined = globalThis.localStorage) {
   storage?.setItem(DATA_MODE_STORAGE_KEY, mode);
-  window.dispatchEvent(new CustomEvent<DataMode>("kiln:data-mode-change", { detail: mode }));
+  window.dispatchEvent(new CustomEvent<DataMode>("arcadia:data-mode-change", { detail: mode }));
 }
 
 export function shouldUseMockData(mode = getStoredDataMode()) {

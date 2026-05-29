@@ -14,7 +14,7 @@ import type { VaultActivityEvent } from "@/lib/realtime";
 
 const STORY_STEPS = [
   { id: "trader-joins", label: "Trader joins", actor: "Trader", detail: "Profile and reputation record appear." },
-  { id: "paper-mode", label: "Paper mode", actor: "Protocol", detail: "Vault starts without investor deposits." },
+  { id: "launchpad", label: "Trader Launchpad", actor: "Protocol", detail: "Vault starts without investor deposits." },
   { id: "proof-built", label: "Proof built", actor: "Protocol", detail: "Public performance earns visibility." },
   { id: "junior-funded", label: "Junior funded", actor: "Trader", detail: "20,000 USDC first-loss capital posted." },
   { id: "investor-deposit", label: "Investor deposits", actor: "Investor", detail: "80,000 USDC senior capital enters." },

@@ -45,7 +45,7 @@ const Stat = ({ label, value, trend }: { label: string; value: string; trend?: n
 );
 
 const MockProfile = ({ trader, vaults: myVaults }: { trader: Trader; vaults: ReturnType<typeof useVaults>["data"] }) => {
-  const activeVaults = (myVaults ?? []).filter(v => v.status === "active" || v.status === "paper");
+   const activeVaults = (myVaults ?? []).filter(v => v.status === "active" || v.status === "launchpad");
   const pastVaults   = (myVaults ?? []).filter(v => v.status === "frozen" || v.status === "closed");
   const totalAum     = (myVaults ?? []).reduce((s, v) => s + v.tvl, 0);
   const gradientIdx  = trader.wallet.charCodeAt(0) % AVATAR_GRADIENTS.length;
@@ -185,7 +185,7 @@ const TraderProfile = () => {
     [allVaults, wallet]
   );
 
-  const activeVaults = myVaults.filter(v => v.status === "active" || v.status === "paper");
+  const activeVaults = myVaults.filter(v => v.status === "active" || v.status === "launchpad");
   const pastVaults   = myVaults.filter(v => v.status === "frozen" || v.status === "closed");
   const totalAum     = myVaults.reduce((s, v) => s + v.tvl, 0);
 

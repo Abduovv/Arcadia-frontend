@@ -67,7 +67,7 @@ export const ProtectedRoute = ({
           setRole(preferredRole);
           toast.success(`Switched to ${roleLabels[preferredRole]} mode`);
         }}
-        secondaryHref={preferredRole === "trader" ? "/vaults" : "/manager"}
+        secondaryHref={preferredRole === "trader" ? "/vaults" : "/trader"}
         secondaryLabel={preferredRole === "trader" ? "View marketplace" : "View manager"}
       />
     );

@@ -46,7 +46,7 @@ const ManagerVault = () => {
     );
   }
 
-  if (!v) return <Navigate to="/manager" replace />;
+  if (!v) return <Navigate to="/trader" replace />;
 
   const parsedUsdcUnits = parseUsdcToUnits(amount);
   const hasValidAmount = parsedUsdcUnits !== null && parsedUsdcUnits > 0n;
@@ -68,7 +68,7 @@ const ManagerVault = () => {
       label: "Paper window complete",
     },
   ];
-  const canGraduate = v.status === "paper" && graduationChecks.every((check) => check.ok);
+  const canGraduate = v.status === "launchpad" && graduationChecks.every((check) => check.ok);
 
   const checks = [
     { ok: true, label: "Whitelisted asset" },
@@ -215,10 +215,10 @@ const ManagerVault = () => {
     <Layout>
       <div className="container py-8">
         <Link
-          to="/manager"
+          to="/trader"
           className="inline-flex h-10 items-center gap-1.5 rounded-md px-2 text-sm text-muted-foreground hover:text-foreground mb-6"
         >
-            <ArrowLeft className="w-3.5 h-3.5" /> Arcadia manager
+            <ArrowLeft className="w-3.5 h-3.5" /> Trader Dashboard
         </Link>
 
         <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
@@ -228,7 +228,7 @@ const ManagerVault = () => {
               <h1 className="font-display type-h2 font-semibold">{v.name}</h1>
               <StatusBadge status={v.status} />
             </div>
-            <p className="text-sm text-muted-foreground">Manager view · {shortAddr(v.managerPubkey)}</p>
+            <p className="text-sm text-muted-foreground">Trader view · {shortAddr(v.managerPubkey)}</p>
           </div>
           <div className="flex gap-2 flex-wrap">
             <DataModeToggle compact />
@@ -250,8 +250,8 @@ const ManagerVault = () => {
           </div>
         </div>
 
-        {v.status === "paper" && (
-          <Banner variant="info" title={`Paper mode — ${v.paperTradeCount}/${v.minQualifyingTrades} trades`}>
+        {v.status === "launchpad" && (
+          <Banner variant="info" title={`Trader Launchpad — ${v.paperTradeCount}/${v.minQualifyingTrades} trades`}>
             Investor deposits open after graduation. Build a positive track record.
           </Banner>
         )}
@@ -358,7 +358,7 @@ const ManagerVault = () => {
           <div className="space-y-6">
             {surfpoolPreview && <LiveJupiterQuotePanel vaultConfigPubkey={v.configPubkey} />}
 
-            {v.status === "paper" && (
+            {v.status === "launchpad" && (
               <div className="surface rounded-lg p-6">
                 <h3 className="font-display font-semibold mb-3">Graduation checklist</h3>
                 <div className="text-sm space-y-2">

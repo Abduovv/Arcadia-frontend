@@ -31,7 +31,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 export type Role = "investor" | "trader";
 export type Network = "devnet";
 
-interface KilnWalletState {
+interface ArcadiaWalletState {
   connected: boolean;
   address: string | null;
   publicKey: PublicKey | null;
@@ -46,7 +46,7 @@ interface KilnWalletState {
   setNetwork: (n: Network) => void;
 }
 
-const defaultState: KilnWalletState = {
+const defaultState: ArcadiaWalletState = {
   connected: false,
   address: null,
   publicKey: null,
@@ -61,9 +61,9 @@ const defaultState: KilnWalletState = {
   setNetwork: () => {},
 };
 
-const KilnWalletContext = createContext<KilnWalletState>(defaultState);
+const ArcadiaWalletContext = createContext<ArcadiaWalletState>(defaultState);
 
-const PREFS_KEY = "kiln.wallet.prefs";
+const PREFS_KEY = "arcadia.wallet.prefs";
 
 interface StoredWalletPrefs {
   role?: Role;
@@ -71,7 +71,7 @@ interface StoredWalletPrefs {
   walletName?: string | null;
 }
 
-function KilnWalletInner({ children }: { children: ReactNode }) {
+function ArcadiaWalletInner({ children }: { children: ReactNode }) {
   const {
     connected,
     publicKey,
@@ -171,7 +171,7 @@ function KilnWalletInner({ children }: { children: ReactNode }) {
     setNetwork("devnet");
   }, [setNetwork]);
 
-  const value: KilnWalletState = useMemo(
+  const value: ArcadiaWalletState = useMemo(
     () => ({
       connected: isConnected,
       address,
@@ -208,9 +208,9 @@ function KilnWalletInner({ children }: { children: ReactNode }) {
   );
 
   return (
-    <KilnWalletContext.Provider value={value}>
+    <ArcadiaWalletContext.Provider value={value}>
       {children}
-    </KilnWalletContext.Provider>
+    </ArcadiaWalletContext.Provider>
   );
 }
 
@@ -227,14 +227,14 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     <ConnectionProvider endpoint={RPC_URL}>
       <SolanaWalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <KilnWalletInner>{children}</KilnWalletInner>
+          <ArcadiaWalletInner>{children}</ArcadiaWalletInner>
         </WalletModalProvider>
       </SolanaWalletProvider>
     </ConnectionProvider>
   );
 };
 
-export const useWallet = () => useContext(KilnWalletContext);
+export const useWallet = () => useContext(ArcadiaWalletContext);
 
 export const shortAddr = (addr: string | null) => {
   if (!addr) return "";

@@ -2,15 +2,18 @@ export interface ApiItems<T> {
   items: T[];
 }
 
-export function getKilnApiUrl(): string {
-  return (import.meta.env.VITE_KILN_API_URL || import.meta.env.VITE_KILN_API_BASE_URL || "").replace(
-    /\/$/,
+export function getArcadiaApiUrl(): string {
+  return (
+    import.meta.env.VITE_ARCADIA_API_URL ||
+    import.meta.env.VITE_ARCADIA_API_BASE_URL ||
+    import.meta.env.VITE_KILN_API_URL ||
+    import.meta.env.VITE_KILN_API_BASE_URL ||
     ""
-  );
+  ).replace(/\/$/, "");
 }
 
 export function getArcadiaRealtimeUrl(): string {
-  const baseUrl = getKilnApiUrl();
+  const baseUrl = getArcadiaApiUrl();
   if (!baseUrl) return "";
   return `${baseUrl.replace(/^http:/, "ws:").replace(/^https:/, "wss:")}/live`;
 }
@@ -30,8 +33,8 @@ export function isArcadiaDevnetProductMode(): boolean {
   return !isArcadiaDemoMode() && (executionEnv === "devnet" || cluster === "devnet");
 }
 
-export async function fetchKilnApi<T>(path: string): Promise<T | null> {
-  const baseUrl = getKilnApiUrl();
+export async function fetchArcadiaApi<T>(path: string): Promise<T | null> {
+  const baseUrl = getArcadiaApiUrl();
   if (!baseUrl) return null;
 
   try {
@@ -41,14 +44,13 @@ export async function fetchKilnApi<T>(path: string): Promise<T | null> {
     }
     return response.json() as Promise<T>;
   } catch (error) {
-    // Log the error for debugging but allow graceful fallback
     console.error(`Failed to fetch from Arcadia API at ${baseUrl}${path}:`, error);
     throw error;
   }
 }
 
-export async function postKilnApi<T>(path: string, body?: unknown): Promise<T | null> {
-  const baseUrl = getKilnApiUrl();
+export async function postArcadiaApi<T>(path: string, body?: unknown): Promise<T | null> {
+  const baseUrl = getArcadiaApiUrl();
   if (!baseUrl) return null;
 
   const response = await fetch(`${baseUrl}${path}`, {
@@ -61,3 +63,10 @@ export async function postKilnApi<T>(path: string, body?: unknown): Promise<T | 
   }
   return response.json() as Promise<T>;
 }
+
+/** @deprecated Use fetchArcadiaApi instead */
+export const fetchKilnApi = fetchArcadiaApi;
+/** @deprecated Use postArcadiaApi instead */
+export const postKilnApi = postArcadiaApi;
+/** @deprecated Use getArcadiaApiUrl instead */
+export const getKilnApiUrl = getArcadiaApiUrl;

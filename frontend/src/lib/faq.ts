@@ -4,8 +4,8 @@ export const FAQ_ITEMS = [
     a: "Junior capital is the trader's own capital committed to the vault. It creates the first protection layer for investor capital.",
   },
   {
-    q: "Why does paper mode exist?",
-    a: "Paper mode gives every trader time to build a public on-chain record before investor deposits are enabled.",
+    q: "Why does Trader Launchpad exist?",
+    a: "Trader Launchpad gives every trader time to build a public on-chain record before investor deposits are enabled.",
   },
   {
     q: "How do investors evaluate a vault?",

@@ -255,7 +255,7 @@ export const VaultCard = ({ vault }: { vault: VaultView }) => {
           className={cn(
             "w-full py-2.5 rounded-[9px] border text-center",
             "font-display font-semibold text-[12px] tracking-wide",
-            "transition-all duration-200",
+            "transition-[color,border-color,background-color] duration-200",
             isTop
               ? "bg-primary/10 border-primary/30 text-primary group-hover:bg-primary/[0.15] group-hover:border-primary/50"
               : "bg-background/70 border-border/50 text-muted-foreground group-hover:text-foreground group-hover:border-primary/30"

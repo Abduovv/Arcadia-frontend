@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 
 const steps = [
   { icon: Layers, title: "Junior and senior capital", body: "Each vault holds two layers. Junior capital comes from the trader. Senior capital comes from investors. Losses always hit junior first — investors are protected as long as the junior buffer holds." },
-  { icon: Activity, title: "Paper mode", body: "New vaults run in paper mode for 30 days with only trader capital. The trader builds a public, on-chain track record before any investor can deposit." },
-  { icon: Award, title: "Graduation", body: "After paper mode and a positive performance check, the vault graduates and opens to investor deposits. The graduation event is recorded on-chain." },
+  { icon: Activity, title: "Trader Launchpad", body: "New vaults run in launchpad mode for 30 days with only trader capital. The trader builds a public, on-chain track record before any investor can deposit." },
+  { icon: Award, title: "Graduation", body: "After the launchpad period and a positive performance check, the vault graduates and opens to investor deposits. The graduation event is recorded on-chain." },
   { icon: TrendingDown, title: "Dynamic risk limits", body: "As the junior buffer drops, position sizes shrink automatically. At 50% junior health, the vault enters cooldown. Below 20%, investor exits become instant." },
   { icon: AlertTriangle, title: "Freeze", body: "If the junior buffer is depleted, trading is disabled and the vault is frozen. Investors withdraw available liquidity. The trader's reputation is permanently affected." },
   { icon: Shield, title: "Performance fees", body: "Traders only earn fees on gains above the previous high-water mark. No fees during drawdowns. No fees on flat performance." },

@@ -124,11 +124,14 @@ export const ConnectModal = ({
     // Watch for real wallet connection completing (Phantom / Solflare popup approved)
     useEffect(() => {
         if (step === "connecting" && chosenWallet && chosenWallet !== "Demo Wallet" && connected) {
+            const targetRole = chosenRole ?? role;
             if (chosenRole) setRole(chosenRole);
-            setStep("success");
             toast.success(`Connected with ${chosenWallet}`, {
-                description: "Devnet · live wallet",
+                description: `Devnet · ${targetRole === "trader" ? "Trader" : "Investor"} mode`,
             });
+            onOpenChange(false);
+            setTimeout(reset, 200);
+            navigate(targetRole === "trader" ? "/trader" : "/portfolio");
         }
     }, [connected, step, chosenWallet]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -140,10 +143,13 @@ export const ConnectModal = ({
             setNetwork("devnet");
             await connect(name);
             if (chosenRole) setRole(chosenRole);
-            setStep("success");
+            const targetRole = chosenRole ?? role;
             toast.success(`Connected with ${name}`, {
-                description: `${chosenRole === "trader" ? "Trader" : "Investor"} mode · Devnet`,
+                description: `${targetRole === "trader" ? "Trader" : "Investor"} mode · Devnet`,
             });
+            onOpenChange(false);
+            setTimeout(reset, 200);
+            navigate(targetRole === "trader" ? "/trader" : "/portfolio");
         } catch (e) {
             setError(e instanceof Error ? e.message : "Connection failed");
             setStep("error");
@@ -451,7 +457,7 @@ export const ConnectModal = ({
                                             const target =
                                                 (chosenRole ?? role) ===
                                                 "trader"
-                                                    ? "/manager"
+                                                    ? "/trader"
                                                     : "/portfolio";
                                             onOpenChange(false);
                                             routeTimerRef.current =

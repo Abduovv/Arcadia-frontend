@@ -32,7 +32,7 @@ const docCards: DocCard[] = [
     icon: FileText,
     title: "Trader guide",
     desc: "Create a vault, fund junior capital, graduate, and manage.",
-    to: "/manager/create",
+    to: "/trader",
   },
 ];
 

@@ -205,7 +205,7 @@ const PROBLEM_COLUMNS = [
       },
       {
         problem: "No credible proof of past performance to show potential investors",
-        solution: "Every trade in paper mode is recorded publicly and permanently on Solana",
+        solution: "Every trade in the launchpad is recorded publicly and permanently on Solana",
       },
       {
         problem: "Fees depend on goodwill and informal agreements",
@@ -389,12 +389,12 @@ const Landing = () => {
   const stats = useMemo(() => ({
     totalVaults: allVaults.length,
     totalTVL: allVaults.reduce((s, v) => s + v.tvl, 0),
-    graduated: allVaults.filter((v) => v.status !== "paper").length,
+    graduated: allVaults.filter((v) => v.status !== "launchpad").length,
     protected: allVaults.reduce((s, v) => s + v.seniorCapital, 0),
   }), [allVaults]);
 
   return (
-    <Layout>
+    <Layout atmospheric>
       {/* 1. Hero */}
       <section className="grid-bg relative min-h-[calc(100dvh-3.75rem)] overflow-hidden border-b border-border/40">
         <video
@@ -455,7 +455,7 @@ const Landing = () => {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-11 border-border/60 font-display font-semibold hover:bg-secondary/60">
-                <Link to="/manager">Trader console</Link>
+                <Link to="/trader">Trader console</Link>
               </Button>
               <Button asChild size="lg" variant="ghost" className="h-11 font-display font-semibold text-muted-foreground hover:bg-secondary/60 hover:text-foreground">
                 <a href="#how-it-works">
@@ -487,16 +487,7 @@ const Landing = () => {
             </motion.div>
           </motion.div>
 
-          <motion.a
-            href="#problem-solution"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-            className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1.5 text-muted-foreground/50 transition-colors hover:text-muted-foreground"
-          >
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em]">scroll</span>
-            <ChevronDown className="h-4 w-4 animate-bounce" />
-          </motion.a>
+          
         </div>
       </section>
 
@@ -589,9 +580,9 @@ const Landing = () => {
             </motion.div>
           </div>
 
-          {/* ── Solution step cards ───────────────────────────────────────── */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {FLOW_STEPS.map((step, i) => {
+          {/* ── Solution step cards: 2 hero + 4 compact ──────────────────── */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            {FLOW_STEPS.slice(0, 2).map((step, i) => {
               const Icon = step.icon;
               return (
                 <motion.div
@@ -599,17 +590,41 @@ const Landing = () => {
                   initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.42, delay: i * 0.07 }}
-                  className="surface rounded-[11px] p-5 border border-border/40 transition-[border-color] hover:border-primary/20"
+                  transition={{ duration: 0.42, delay: i * 0.08 }}
+                  className="surface rounded-[11px] p-7 border border-border/40 transition-[border-color] hover:border-primary/25 lg:min-h-[18rem]"
                 >
-                  <div className="mb-4 flex items-center justify-between">
+                  <div className="mb-5 flex items-center justify-between">
                     <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-primary">{step.n}</span>
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Icon className="h-4 w-4" aria-hidden="true" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="h-4.5 w-4.5" aria-hidden="true" />
                     </div>
                   </div>
-                  <h3 className="font-display text-base font-semibold">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+                  <h3 className="font-display text-lg font-semibold">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {FLOW_STEPS.slice(2).map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <motion.div
+                  key={step.n}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.38, delay: i * 0.06 }}
+                  className="surface rounded-[11px] p-5 border border-border/40 transition-[border-color] hover:border-primary/20"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-primary">{step.n}</span>
+                    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary">
+                      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <h3 className="font-display text-[14px] font-semibold">{step.title}</h3>
+                  <p className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground">{step.body}</p>
                 </motion.div>
               );
             })}
@@ -618,33 +633,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* 4. Stats / Credibility */}
-      <section className="border-b border-border/35 py-10">
-        <div className="container">
-          <div className="grid gap-px overflow-hidden rounded-[11px] border border-border/45 bg-border/25 md:grid-cols-4">
-            {[
-              { l: "Total TVL", v: `${fmtUSD(stats.totalTVL, { compact: true })} USDC` },
-              { l: "Live vaults", v: String(stats.totalVaults) },
-              { l: "Graduated vaults", v: String(stats.graduated) },
-              { l: "Protected capital", v: `${fmtUSD(stats.protected, { compact: true })} USDC` },
-            ].map((s, i) => (
-              <motion.div
-                key={s.l}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="bg-background px-6 py-7"
-              >
-                <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{s.l}</div>
-                <div className="font-display text-2xl font-bold tabular text-foreground">{s.v}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Marketplace */}
+      {/* 4. Marketplace + Stats */}
       <section className="border-b border-border/35 py-20">
         <div className="container">
           <div className="mb-8 flex items-end justify-between gap-6">
@@ -660,6 +649,20 @@ const Landing = () => {
                 <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
               </Link>
             </Button>
+          </div>
+
+          <div className="mb-8 grid gap-px overflow-hidden rounded-[11px] border border-border/45 bg-border/25 md:grid-cols-4">
+            {[
+              { l: "Total TVL", v: `${fmtUSD(stats.totalTVL, { compact: true })} USDC` },
+              { l: "Live vaults", v: String(stats.totalVaults) },
+              { l: "Graduated", v: String(stats.graduated) },
+              { l: "Protected", v: `${fmtUSD(stats.protected, { compact: true })} USDC` },
+            ].map((s) => (
+              <div key={s.l} className="bg-background px-5 py-5">
+                <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{s.l}</div>
+                <div className="font-display text-xl font-bold tabular text-foreground">{s.v}</div>
+              </div>
+            ))}
           </div>
 
           {featuredVaults.length === 0 && (
@@ -702,7 +705,7 @@ const Landing = () => {
 
             <div className="flex flex-col gap-3">
               {[
-                { tier: "Paper", desc: "Build a record before investor deposits.", num: "01" },
+                { tier: "Launchpad", desc: "Build a record before investor deposits.", num: "01" },
                 { tier: "Graduated", desc: "Open to capital with verified history.", num: "02" },
                 { tier: "Proven", desc: "Earn visibility through consistent outcomes.", num: "03" },
                 { tier: "Institutional", desc: "Scale access through durable performance.", num: "04" },
@@ -792,7 +795,7 @@ const Landing = () => {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="font-display font-semibold">
-                <Link to="/manager/create">Launch Vault</Link>
+                <Link to="/trader">Launch Vault</Link>
               </Button>
               <Button asChild size="lg" variant="ghost" className="font-display font-semibold text-muted-foreground hover:bg-secondary/60 hover:text-foreground">
                 <Link to="/demo-control">View Surfpool Demo</Link>

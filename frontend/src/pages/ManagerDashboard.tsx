@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { useVaults } from "@/hooks/useVaults";
@@ -12,12 +12,14 @@ import { Button } from "@/components/ui/button";
 import { fmtUSD } from "@/lib/format";
 import { Plus, DollarSign, Loader2, Wallet, LayoutDashboard, ArrowRight } from "lucide-react";
 import { DataModeToggle } from "@/components/DataModeToggle";
+import { CreateVaultModal } from "@/components/CreateVaultModal";
 
 const ManagerDashboard = () => {
   const navigate = useNavigate();
   const { connected, address } = useWallet();
   const { isMock } = useDataMode();
   const { data: allVaults, isLoading } = useVaults();
+  const [createOpen, setCreateOpen] = useState(false);
 
   const myVaults = useMemo(() => {
     const vaults = allVaults ?? [];
@@ -27,7 +29,7 @@ const ManagerDashboard = () => {
 
   const aum = myVaults.reduce((s, v) => s + v.tvl, 0);
   const junior = myVaults.reduce((s, v) => s + v.juniorCapital, 0);
-  const paperVault = myVaults.find(v => v.status === "paper");
+  const launchpadVault = myVaults.find(v => v.status === "launchpad");
 
   if (!connected && !isMock) {
     return (
@@ -48,15 +50,13 @@ const ManagerDashboard = () => {
             <span className="page-header-label">
               <LayoutDashboard className="w-3 h-3" /> Trader operations
             </span>
-            <h1 className="font-display type-h1 font-semibold mt-3">Manager dashboard</h1>
-            <p className="text-muted-foreground mt-2 text-[14px]">Operate trader vaults, manage paper mode, and protect investor trust.</p>
+            <h1 className="font-display type-h1 font-semibold mt-3">Trader Dashboard</h1>
+            <p className="text-muted-foreground mt-2 text-[14px]">Operate your vaults, build your track record, and protect investor trust.</p>
           </div>
           <div className="flex gap-2">
             <DataModeToggle compact />
-            <Button asChild className="h-9 bg-primary text-primary-foreground hover:bg-primary-glow border-0 font-display font-semibold">
-              <Link to="/manager/create">
-                <Plus className="w-3.5 h-3.5 mr-1.5" /> Create vault
-              </Link>
+            <Button onClick={() => setCreateOpen(true)} className="h-9 bg-primary text-primary-foreground hover:bg-primary-glow border-0 font-display font-semibold">
+              <Plus className="w-3.5 h-3.5 mr-1.5" /> Create vault
             </Button>
           </div>
         </div>
@@ -64,7 +64,7 @@ const ManagerDashboard = () => {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           <StatCard label="Active vaults" value={myVaults.filter(v => v.status === "active").length} />
-          <StatCard label="Paper vaults" value={myVaults.filter(v => v.status === "paper").length} />
+          <StatCard label="Launchpad vaults" value={myVaults.filter(v => v.status === "launchpad").length} />
           <StatCard label="Total AUM" value={`${fmtUSD(aum, { compact: true })} USDC`} />
           <StatCard label="Junior deployed" value={`${fmtUSD(junior, { compact: true })} USDC`} />
         </div>
@@ -86,8 +86,8 @@ const ManagerDashboard = () => {
               {myVaults.map(v => (
                 <Link
                   key={v.id}
-                  to={`/manager/vault/${v.id}`}
-                  className="surface rounded-[11px] p-5 block hover:border-border-strong hover:-translate-y-px transition-all duration-200 group"
+                  to={`/trader/vault/${v.id}`}
+                  className="surface rounded-[11px] p-5 block hover:border-border-strong hover:-translate-y-px transition-[transform,border-color] duration-200 group"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                     <div className="flex items-center gap-2.5 flex-wrap">
@@ -122,29 +122,23 @@ const ManagerDashboard = () => {
                   <DollarSign className="w-4 h-4 text-primary" /> Quick actions
                 </h3>
                 <div className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full justify-start h-9 text-[13px]" asChild>
-                    <Link to="/manager/create">
+                    <Button variant="outline" size="sm" className="w-full justify-start h-9 text-[13px]" onClick={() => setCreateOpen(true)}>
                       <Plus className="w-3.5 h-3.5 mr-2" /> Create new vault
-                    </Link>
-                  </Button>
+                    </Button>
                   <Button variant="outline" size="sm" className="w-full justify-start h-9 text-[13px]" asChild>
                     <Link to="/trade">Open trading terminal</Link>
                   </Button>
                 </div>
               </div>
 
-              {paperVault && (
-                <div className="surface rounded-[11px] p-5 border-primary/25">
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent rounded-t-[11px]" />
-                  <div className="font-mono text-[10px] uppercase tracking-[0.13em] text-primary mb-2">Graduation pending</div>
-                  <h3 className="font-display font-semibold text-[14px] mb-2">{paperVault.name}</h3>
-                  <p className="font-mono text-[11px] text-muted-foreground mb-4">
-                    {paperVault.paperTradeCount}/{paperVault.minQualifyingTrades} qualifying trades completed.
+              {launchpadVault && (
+                <div className="surface rounded-[11px] p-5">
+                  <h3 className="font-display font-semibold text-[14px] mb-2">{launchpadVault.name}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {launchpadVault.paperTradeCount}/{launchpadVault.minQualifyingTrades} qualifying trades completed.
                   </p>
-                  <Button
-                    size="sm"
-                    className="h-8 w-full bg-primary text-primary-foreground hover:bg-primary-glow border-0 text-[12px] font-semibold"
-                    onClick={() => navigate(`/manager/vault/${paperVault.id}`)}
+                  <Button size="sm" variant="outline"
+                    onClick={() => navigate(`/trader/vault/${launchpadVault.id}`)}
                   >
                     View vault
                   </Button>
@@ -172,6 +166,7 @@ const ManagerDashboard = () => {
           </div>
         )}
       </div>
+      <CreateVaultModal open={createOpen} onOpenChange={setCreateOpen} />
     </Layout>
   );
 };

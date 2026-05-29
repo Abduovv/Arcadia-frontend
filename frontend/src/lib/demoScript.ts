@@ -20,7 +20,7 @@ export const DEMO_STEPS: DemoStep[] = [
     phase: "overview",
     caption: "Arcadia starts with proof, not promises",
     subcaption:
-      "A trader can only access investor capital after risking their own junior capital first and proving the vault can survive paper mode.",
+      "A trader can only access investor capital after risking their own junior capital first and proving the vault can survive the Trader Launchpad.",
     route: "/",
     duration: 6500,
   },
@@ -32,7 +32,7 @@ export const DEMO_STEPS: DemoStep[] = [
     caption: "Step 1: trader dashboard",
     subcaption:
       "The trader enters operator mode. For the MVP, there is no reputation shortcut: access is earned by posting junior capital and passing vault rules.",
-    route: "/manager",
+    route: "/trader",
     duration: 5500,
   },
   {
@@ -41,7 +41,7 @@ export const DEMO_STEPS: DemoStep[] = [
     caption: "Step 2: create a vault with first-loss capital",
     subcaption:
       "The vault starts with strategy name, fee, max slippage, and the trader's junior deposit. Investor capital is still blocked.",
-    route: "/manager/create",
+    route: "/trader",
     duration: 4000,
   },
   {
@@ -55,7 +55,7 @@ export const DEMO_STEPS: DemoStep[] = [
   {
     id: "paper-mode",
     phase: "trader",
-    caption: "Step 4: paper mode begins",
+    caption: "Step 4: Trader Launchpad begins",
     subcaption:
       "No investor funds are at risk yet. The trader must build a live track record while keeping the junior buffer above the graduation threshold.",
     duration: 4000,

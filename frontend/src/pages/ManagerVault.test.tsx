@@ -82,9 +82,9 @@ function renderPage() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={["/manager/vault/test-vault"]}>
+      <MemoryRouter initialEntries={["/trader/vault/test-vault"]}>
         <Routes>
-          <Route path="/manager/vault/:id" element={<ManagerVault />} />
+          <Route path="/trader/vault/:id" element={<ManagerVault />} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,
@@ -110,7 +110,7 @@ describe("ManagerVault transaction flows", () => {
       statePubkey: key(3).toBase58(),
       treasuryPubkey: key(4).toBase58(),
       managerPubkey,
-      status: "paper",
+      status: "launchpad",
       tvl: 4,
       juniorCapital: 4,
       seniorCapital: 0,

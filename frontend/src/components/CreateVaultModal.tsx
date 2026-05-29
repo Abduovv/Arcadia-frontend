@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from "react";
-import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Banner } from "@/components/Banner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Check, ChevronRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -15,16 +15,14 @@ import { parseUsdcToUnits } from "@/lib/solana/amounts";
 import { useDataMode } from "@/hooks/useDataMode";
 import { mockStore } from "@/lib/mockStore";
 
-
-const steps = ["Identity", "Risk setup", "Junior capital", "Trader Launchpad", "Review"];
-
+const STEPS = ["Identity", "Risk", "Capital", "Launchpad", "Review"];
 const RISK_PROFILES = {
   conservative: { feeBps: 1500, maxSlippageBps: 100 },
   balanced: { feeBps: 2000, maxSlippageBps: 200 },
   aggressive: { feeBps: 2000, maxSlippageBps: 300 },
 } as const;
 
-const CreateVault = () => {
+export const CreateVaultModal = ({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) => {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [risk, setRisk] = useState<"conservative" | "balanced" | "aggressive">("balanced");
@@ -37,7 +35,8 @@ const CreateVault = () => {
   const { publicKey, connection } = useWallet();
   const { isMock } = useDataMode();
 
-  const next = () => setStep(s => Math.min(steps.length - 1, s + 1));
+  const reset = () => { setStep(0); setName(""); setRisk("balanced"); setJunior("1"); setAccept(false); setSending(false); };
+  const next = () => setStep(s => Math.min(STEPS.length - 1, s + 1));
   const back = () => setStep(s => Math.max(0, s - 1));
 
   const handleCreate = async () => {
@@ -51,48 +50,30 @@ const CreateVault = () => {
         const profile = RISK_PROFILES[risk];
         await new Promise(r => setTimeout(r, 800));
         toast.info("Initialising trader profile…");
-        await new Promise(r => setTimeout(r, 700));
-        toast.info("Creating vault on-chain…");
         await new Promise(r => setTimeout(r, 900));
-        toast.info("Depositing junior capital…");
+        toast.info("Creating vault on-chain…");
         await new Promise(r => setTimeout(r, 700));
-        mockStore.createVault({
-          name: name.slice(0, 32),
-          feeBps: profile.feeBps,
-          maxSlippageBps: profile.maxSlippageBps,
-          juniorAmount: juniorUsdc,
-        });
+        mockStore.createVault({ name: name.slice(0, 32), feeBps: profile.feeBps, maxSlippageBps: profile.maxSlippageBps, juniorAmount: juniorUsdc });
         toast.success("Vault created & funded!", { description: `${juniorUsdc.toFixed(2)} USDC junior capital posted. Trader Launchpad begins now.` });
+        onOpenChange(false);
+        reset();
         navigate("/trader");
         return;
       }
 
       if (!publicKey || !connection) { toast.error("Wallet not connected"); return; }
-      try {
-        await initManager();
-      } catch {
-        // Trader profile may already exist
-      }
-
+      try { await initManager(); } catch { /* profile may exist */ }
       const profile = RISK_PROFILES[risk];
-      await createVault({
-        name: name.slice(0, 32),
-        feeBps: profile.feeBps,
-        maxSlippageBps: profile.maxSlippageBps,
-        paperWindowSecs: 30 * 24 * 60 * 60,
-      });
-
+      await createVault({ name: name.slice(0, 32), feeBps: profile.feeBps, maxSlippageBps: profile.maxSlippageBps, paperWindowSecs: 30 * 24 * 60 * 60 });
       const [profilePda] = getManagerProfilePDA(publicKey);
       const profileInfo = await connection.getAccountInfo(profilePda);
-      const vaultIndex = profileInfo
-        ? Buffer.from(profileInfo.data).readUInt16LE(56) - 1
-        : 0;
+      const vaultIndex = profileInfo ? Buffer.from(profileInfo.data).readUInt16LE(56) - 1 : 0;
       const [configPda] = getVaultConfigPDA(publicKey, vaultIndex);
-
       await depositJunior(configPda, juniorUsdcUnits);
-
       toast.success("Vault created & funded!");
-      navigate("/manager");
+      onOpenChange(false);
+      reset();
+      navigate("/trader");
     } catch (e) {
       toast.error("Create vault failed", { description: e instanceof Error ? e.message : "Unknown error" });
     } finally {
@@ -101,30 +82,27 @@ const CreateVault = () => {
   };
 
   return (
-    <Layout>
-      <div className="container py-10 max-w-3xl">
-        <h1 className="font-display type-h1 font-semibold mb-2">Create vault</h1>
-        <p className="text-muted-foreground mb-8">Launch a new vault. Starts in Trader Launchpad to build your track record.</p>
-
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) reset(); }}>
+      <DialogContent className="surface-elevated border-border-strong max-w-lg p-0 overflow-hidden">
         {/* Stepper */}
-        <div className="flex items-center gap-2 mb-8 overflow-x-auto scrollbar-thin pb-2">
-          {steps.map((s, i) => (
-            <div key={s} className="flex items-center gap-2 shrink-0">
-              <div className={cn("flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium",
+        <div className="flex items-center gap-1.5 px-6 pt-5 overflow-x-auto">
+          {STEPS.map((s, i) => (
+            <div key={s} className="flex items-center gap-1.5 shrink-0">
+              <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-medium",
                 i === step ? "border-primary text-primary bg-primary/10" :
                 i < step ? "border-success/30 text-success bg-success/10" : "border-border text-muted-foreground")}>
                 {i < step ? <Check className="w-3 h-3" /> : <span className="tabular">{i + 1}</span>}
                 {s}
               </div>
-              {i < steps.length - 1 && <ChevronRight className="w-3 h-3 text-muted-foreground" />}
+              {i < STEPS.length - 1 && <ChevronRight className="w-3 h-3 text-muted-foreground" />}
             </div>
           ))}
         </div>
 
-        <div className="surface rounded-lg p-6 md:p-8 min-h-[360px]">
+        <div className="p-6 min-h-[300px]">
           {step === 0 && (
             <div className="space-y-4">
-              <h2 className="font-display type-h3 font-semibold">Vault identity</h2>
+              <DialogHeader><DialogTitle className="font-display text-xl">Vault identity</DialogTitle></DialogHeader>
               <div>
                 <label className="text-sm font-medium">Name (max 32 chars)</label>
                 <Input className="mt-1.5" value={name} onChange={e => setName(e.target.value.slice(0, 32))} placeholder="e.g. Signal Macro III" />
@@ -132,19 +110,19 @@ const CreateVault = () => {
             </div>
           )}
           {step === 1 && (
-            <div className="space-y-5">
-              <h2 className="font-display type-h3 font-semibold">Risk setup</h2>
-              <p className="text-sm text-muted-foreground">Defines fee, slippage, and reserve parameters.</p>
+            <div className="space-y-4">
+              <DialogHeader><DialogTitle className="font-display text-xl">Risk setup</DialogTitle></DialogHeader>
+              <p className="text-sm text-muted-foreground">Fee, slippage, and reserve parameters.</p>
               <div>
                 <label className="text-sm font-medium mb-2 block">Risk profile</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(["conservative", "balanced", "aggressive"] as const).map(r => (
-                    <button key={r} onClick={() => setRisk(r)} className={cn("p-4 rounded-lg border text-left", risk === r ? "border-primary bg-primary/5" : "border-border hover:bg-secondary")}>
+                    <button key={r} onClick={() => setRisk(r)} className={cn("p-3 rounded-lg border text-left text-sm", risk === r ? "border-primary bg-primary/5" : "border-border hover:bg-secondary")}>
                       <div className="font-semibold capitalize">{r}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {r === "conservative" && "15% fee, 1% slippage"}
-                        {r === "balanced" && "20% fee, 2% slippage"}
-                        {r === "aggressive" && "20% fee, 3% slippage"}
+                      <div className="text-[11px] text-muted-foreground mt-0.5">
+                        {r === "conservative" && "15% fee · 1% slip"}
+                        {r === "balanced" && "20% fee · 2% slip"}
+                        {r === "aggressive" && "20% fee · 3% slip"}
                       </div>
                     </button>
                   ))}
@@ -152,11 +130,11 @@ const CreateVault = () => {
               </div>
               <div>
                 <label className="text-sm font-medium mb-2 block">Reserve allocation</label>
-                <p className="text-xs text-muted-foreground mb-2">Percentage of your performance fees automatically routed into the reserve pool. Higher reserve means stronger investor protection.</p>
+                <p className="text-xs text-muted-foreground mb-2">% of your fees routed into reserve pool for investor protection.</p>
                 <div className="grid grid-cols-4 gap-2">
                   {[500, 1000, 1500, 2000].map(bps => (
-                    <button key={bps} onClick={() => setReserveAllocBps(bps)} className={cn("p-3 rounded-lg border text-center", reserveAllocBps === bps ? "border-primary bg-primary/5" : "border-border hover:bg-secondary")}>
-                      <div className="font-semibold text-sm">{bps / 100}%</div>
+                    <button key={bps} onClick={() => setReserveAllocBps(bps)} className={cn("p-2 rounded-lg border text-center text-sm", reserveAllocBps === bps ? "border-primary bg-primary/5" : "border-border hover:bg-secondary")}>
+                      {(bps / 100)}%
                     </button>
                   ))}
                 </div>
@@ -165,7 +143,7 @@ const CreateVault = () => {
           )}
           {step === 2 && (
             <div className="space-y-4">
-              <h2 className="font-display type-h3 font-semibold">Junior capital</h2>
+              <DialogHeader><DialogTitle className="font-display text-xl">Junior capital</DialogTitle></DialogHeader>
               <p className="text-sm text-muted-foreground">Your first-loss USDC. Required to back the vault.</p>
               <div>
                 <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
@@ -181,13 +159,13 @@ const CreateVault = () => {
           )}
           {step === 3 && (
             <div className="space-y-4">
-              <h2 className="font-display type-h3 font-semibold">Trader Launchpad</h2>
-              <ul className="space-y-3 text-sm">
-                {["30-day paper-mode trading required", "Investor deposits disabled until graduation", "All trades publicly recorded on-chain", "Performance affects future investor trust"].map(t => (
+              <DialogHeader><DialogTitle className="font-display text-xl">Trader Launchpad</DialogTitle></DialogHeader>
+              <ul className="space-y-2.5 text-sm">
+                {["30-day track record required", "Investor deposits disabled until graduation", "All trades publicly recorded on-chain", "Performance affects future investor trust"].map(t => (
                   <li key={t} className="flex items-start gap-2"><Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />{t}</li>
                 ))}
               </ul>
-              <label className="flex items-start gap-2 mt-6 p-4 rounded-lg border border-border cursor-pointer">
+              <label className="flex items-start gap-2 mt-4 p-3 rounded-lg border border-border cursor-pointer">
                 <input type="checkbox" checked={accept} onChange={e => setAccept(e.target.checked)} className="mt-1 accent-primary" />
                 <span className="text-sm">I understand this vault starts in Trader Launchpad and cannot accept investor deposits until graduation.</span>
               </label>
@@ -195,38 +173,33 @@ const CreateVault = () => {
           )}
           {step === 4 && (
             <div className="space-y-4">
-              <h2 className="font-display type-h3 font-semibold">Review</h2>
-              <dl className="text-sm space-y-2 surface-elevated rounded-lg p-4">
+              <DialogHeader><DialogTitle className="font-display text-xl">Review</DialogTitle></DialogHeader>
+              <dl className="text-sm space-y-2 surface rounded-lg p-4">
                 <Row label="Name" value={name || "—"} />
                 <Row label="Risk profile" value={<span className="capitalize">{risk}</span>} />
                 <Row label="Fee" value={`${RISK_PROFILES[risk].feeBps / 100}% above HWM`} />
                 <Row label="Reserve allocation" value={`${reserveAllocBps / 100}% of fees → reserve`} />
                 <Row label="Max slippage" value={`${RISK_PROFILES[risk].maxSlippageBps / 100}%`} />
-                <Row label="Junior deposit" value={`${parseFloat(junior || "0").toFixed(4)} USDC`} />
-                <Row label="Paper window" value="30 days" />
-                <Row label="Estimated gas" value="~0.003 SOL" />
+                <Row label="Junior deposit" value={`${parseFloat(junior || "0")} USDC`} />
+                <Row label="Launchpad window" value="30 days" />
               </dl>
             </div>
           )}
 
-          <div className="flex justify-between mt-8 pt-6 border-t border-border">
+          <div className="flex justify-between mt-6 pt-4 border-t border-border">
             <Button variant="outline" onClick={back} disabled={step === 0}>Back</Button>
-            {step < steps.length - 1 ? (
+            {step < STEPS.length - 1 ? (
               <Button onClick={next} className="bg-gradient-signal text-primary-foreground border-0" disabled={(step === 0 && !name) || (step === 3 && !accept)}>Continue</Button>
             ) : (
-              <Button
-                onClick={handleCreate}
-                disabled={sending}
-                className="bg-gradient-signal text-primary-foreground border-0"
-              >
-                {sending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              <Button onClick={handleCreate} disabled={sending} className="bg-gradient-signal text-primary-foreground border-0">
+                {sending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
                 Create & fund vault
               </Button>
             )}
           </div>
         </div>
-      </div>
-    </Layout>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -236,5 +209,3 @@ const Row = ({ label, value }: { label: string; value: ReactNode }) => (
     <dd className="font-medium">{value}</dd>
   </div>
 );
-
-export default CreateVault;

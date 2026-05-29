@@ -3,6 +3,7 @@ import {
   type DataMode,
   getStoredDataMode,
   setStoredDataMode,
+  DATA_MODE_STORAGE_KEY,
 } from "@/lib/dataMode";
 
 export function useDataMode() {
@@ -10,17 +11,17 @@ export function useDataMode() {
 
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
-      if (event.key === "kiln:data-mode") setModeState(getStoredDataMode());
+      if (event.key === DATA_MODE_STORAGE_KEY) setModeState(getStoredDataMode());
     };
     const onModeChange = (event: Event) => {
       setModeState((event as CustomEvent<DataMode>).detail);
     };
 
     window.addEventListener("storage", onStorage);
-    window.addEventListener("kiln:data-mode-change", onModeChange);
+    window.addEventListener("arcadia:data-mode-change", onModeChange);
     return () => {
       window.removeEventListener("storage", onStorage);
-      window.removeEventListener("kiln:data-mode-change", onModeChange);
+      window.removeEventListener("arcadia:data-mode-change", onModeChange);
     };
   }, []);
 

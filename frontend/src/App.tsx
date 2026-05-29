@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,20 +15,20 @@ import { DemoRunner } from "./components/DemoRunner";
 // Index loads eagerly so the landing page is instant — no loading screen
 import Index from "./pages/Index";
 
-const Vaults         = lazy(() => import("./pages/Vaults.tsx"));
-const VaultDetail    = lazy(() => import("./pages/VaultDetail.tsx"));
-const Traders        = lazy(() => import("./pages/Traders.tsx"));
-const TraderProfile  = lazy(() => import("./pages/TraderProfile.tsx"));
-const Portfolio      = lazy(() => import("./pages/Portfolio.tsx"));
-const Settings       = lazy(() => import("./pages/Settings.tsx"));
-const ManagerDashboard = lazy(() => import("./pages/ManagerDashboard.tsx"));
-const ManagerVault   = lazy(() => import("./pages/ManagerVault.tsx"));
-const CreateVault    = lazy(() => import("./pages/CreateVault.tsx"));
-const Trade          = lazy(() => import("./pages/Trade.tsx"));
-const HowItWorks     = lazy(() => import("./pages/HowItWorks.tsx"));
-const Docs           = lazy(() => import("./pages/Docs.tsx"));
-const DemoControl    = lazy(() => import("./pages/DemoControl.tsx"));
-const NotFound       = lazy(() => import("./pages/NotFound.tsx"));
+const Vaults             = lazy(() => import("./pages/Vaults.tsx"));
+const VaultDetail        = lazy(() => import("./pages/VaultDetail.tsx"));
+const Traders            = lazy(() => import("./pages/Traders.tsx"));
+const TraderProfile      = lazy(() => import("./pages/TraderProfile.tsx"));
+const Portfolio          = lazy(() => import("./pages/Portfolio.tsx"));
+const Settings           = lazy(() => import("./pages/Settings.tsx"));
+const TraderDashboard    = lazy(() => import("./pages/ManagerDashboard.tsx"));
+const TraderVault        = lazy(() => import("./pages/ManagerVault.tsx"));
+const Trade              = lazy(() => import("./pages/Trade.tsx"));
+const HowItWorks         = lazy(() => import("./pages/HowItWorks.tsx"));
+const Docs               = lazy(() => import("./pages/Docs.tsx"));
+const FAQ                = lazy(() => import("./pages/FAQ.tsx"));
+const DemoControl        = lazy(() => import("./pages/DemoControl.tsx"));
+const NotFound           = lazy(() => import("./pages/NotFound.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -73,26 +73,18 @@ const App = () => (
                                         }
                                     />
                                     <Route
-                                        path="/manager"
+                                        path="/trader"
                                         element={
                                             <ProtectedRoute allowedRoles={["trader"]} requireConnection={false} mode="redirect">
-                                                <ManagerDashboard />
+                                                <TraderDashboard />
                                             </ProtectedRoute>
                                         }
                                     />
                                     <Route
-                                        path="/manager/create"
+                                        path="/trader/vault/:id"
                                         element={
                                             <ProtectedRoute allowedRoles={["trader"]} requireConnection={false} mode="redirect">
-                                                <CreateVault />
-                                            </ProtectedRoute>
-                                        }
-                                    />
-                                    <Route
-                                        path="/manager/vault/:id"
-                                        element={
-                                            <ProtectedRoute allowedRoles={["trader"]} requireConnection={false} mode="redirect">
-                                                <ManagerVault />
+                                                <TraderVault />
                                             </ProtectedRoute>
                                         }
                                     />
@@ -104,6 +96,8 @@ const App = () => (
                                             </ProtectedRoute>
                                         }
                                     />
+                                    {/* Backward compat redirects from /manager -> /trader */}
+                                    <Route path="/manager/*" element={<Navigate to="/trader" replace />} />
                                     <Route path="/how-it-works" element={<HowItWorks />} />
                                     <Route path="/docs" element={<Docs />} />
                                     <Route path="/faq" element={<FAQ />} />
